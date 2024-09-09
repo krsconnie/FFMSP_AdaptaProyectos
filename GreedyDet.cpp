@@ -34,7 +34,10 @@ int main(int argc, char const *argv[]){
     // Referencia en contador = A(0), C(1), G(2), T(3)
     int contador[4] = {0,0,0,0}; // Arreglo contador inicializado en 0
 
-   
+    double tiempo = 0;
+
+    auto start = std::chrono::high_resolution_clock::now();
+
     // Iterador para recorrer los caracteres del string
     for (int i = 0; i < m; i++){
         
@@ -102,7 +105,7 @@ int main(int argc, char const *argv[]){
                     }
                 }
             
-                if(condicion == dHam){
+                if(condicion >= dHam){
                     conjuntoSolucion.push_back(*it2);
                     std::cout << "Se agrega línea al conjunto solución" << std::endl;
                     it2 = lista.erase(it2); // Elimina y actualiza el iterador
@@ -110,12 +113,19 @@ int main(int argc, char const *argv[]){
                 } else {
                     ++it2; // Avanza el iterador si no se elimina
                 }
+
+                condicion = 0;
             }
         }
     }
 
-    std::cout << "Línea solución encontrada: " << solucion;
-    std::cout << "\nDistancia Hamming designada: " << dHam << "\nCalidad de la solución: " << conjuntoSolucion.size() << std::endl;
-
+    auto end = std::chrono::high_resolution_clock::now();
+    tiempo = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+     
+    tiempo*=(1e-9);
+    
+    std::cout << "Tamaño de la solución: " << solucion.size() << " // Línea solución encontrada: " << solucion;
+    std::cout << "\nDistancia Hamming designada: " << dHam << "\nCalidad de la solución: " << conjuntoSolucion.size() << "\nConjunto original queda con: " << lista.size()  << std::endl;
+    std::cout << "Tiempo usado: " << tiempo << " segundos" <<std::endl;
     return 0;
 }
