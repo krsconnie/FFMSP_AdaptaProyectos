@@ -27,6 +27,7 @@ int main(int argc, char const *argv[]){
     int m = std::stoi(nombreArchivo.substr(4,3)); // Largo del string 
     char solucion[m]; // String solucion 
 
+    int dHam = n*umbral; // Distancia de Hamming
 
     std::list<std::string> conjuntoSolucion; 
 
@@ -70,8 +71,10 @@ int main(int argc, char const *argv[]){
             }
 
         }
+
         // Comparador de la letra con la menor ocurrencia para agregarla al string solucion
         int minIndex = std::distance(std::begin(contador), std::min_element(std::begin(contador), std::end(contador)));
+        // Flag
         std::cout << minIndex << std::endl;
             
             switch(minIndex){
@@ -96,11 +99,37 @@ int main(int argc, char const *argv[]){
                     break;
         }    
 
+        // Reinicio del contador
         memset(contador, 0, sizeof(contador));
 
+        /* 
+        Una vez se itera por un número igual o mayor al umbral
+        se compara el string "solution" con los strings de la lista.
+        Si cumplen el requisito salen de la lista y se agregan al conjunto solucion.
+        */
+        if( i >= (dHam - 1)){
+            for(std::list<std::string>::iterator it2 = lista.begin(); it2 != lista.end();it2++){
+                
+                 // Cuenta la distancia de Hamming entre el string de la lista y el string solution
+                 int condicion = 0; 
 
+                for (int j = 0; j < dHam ; j++){
 
+                    char a = (*it2).at(j);
+
+                    if (a == solucion[j]){
+                        condicion++;
+                    }
+                 }
+            // Si se cumple la condición agregamos el string de la lista
+            // al conjunto solucion y despues lo borramos de la lista original.      
+            if(condicion == dHam){
+
+            }
+            }
+        }
     }
+
 
    
     return 0;
