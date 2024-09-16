@@ -31,6 +31,7 @@ bool evaluate(const std::list<std::string> &lista, const std::string &solucion, 
 
 int main(int argc, char const *argv[]) {
 
+    srand(time(0));
     float umbral = atof(argv[4]); // Umbral para la distancia de Hamming
     int mode = atoi(argv[5]);
 
@@ -38,6 +39,7 @@ int main(int argc, char const *argv[]) {
         std::cerr << "Uso: " << argv[0] << " -i <instancia_problema> -th threshold < 0 / 1 > \n 0 = Greedy Determinista \n 1 = Greedy Aleatorizado" << std::endl;
         return EXIT_FAILURE;
     }
+
 
 
     std::string nombreArchivo = argv[2];
@@ -62,72 +64,124 @@ int main(int argc, char const *argv[]) {
 
     std::vector<char> bases = {'A', 'C', 'G', 'T'}; // Posibles caracteres para elegir
 
+    int dado;
+    dado = rand() % 2;
+
     for (int i = 0; i < m; i++){
-        for(auto it = lista.begin(); it != lista.end(); it++){
-            char a = (*it).at(i);
-            switch(a){
-                case 'A': contador[0]++; break;
-                case 'C': contador[1]++; break;
-                case 'G': contador[2]++; break;
-                case 'T': contador[3]++; break;
-                default: break;
+        if(mode == 0 || dado == 0){
+            
+            for(auto it = lista.begin(); it != lista.end(); it++){
+                char a = (*it).at(i);
+                
+                switch(a){
+                    case 'A':
+                        contador[0]++; 
+                        break;
+
+                    case 'C': 
+                        contador[1]++; 
+                        break;
+
+                    case 'G': 
+                        contador[2]++; 
+                        break;
+
+                    case 'T': 
+                        contador[3]++; 
+                        break;
+
+                    default: 
+                        break;
+                }
             }
-        }
 
-        // Evaluar cada carácter ('A', 'C', 'G', 'T') para ver si es válido
-        std::map<char, bool> validChars;
-        for (char base : bases) {
-            validChars[base] = evaluate(lista, solucion, base, dHam); // Verifica si agregar el carácter es válido
-        }
-
-        // Crear un vector de caracteres válidos
-        std::vector<char> candidatos;
-        for (const auto& kv : validChars) {
-            if (kv.second) {
-                candidatos.push_back(kv.first); // Agregar caracteres válidos a la lista de candidatos
+            // Evaluar cada carácter ('A', 'C', 'G', 'T') para ver si es válido
+            std::map<char, bool> validChars;
+            
+            for (char base : bases) {
+            
+                validChars[base] = evaluate(lista, solucion, base, dHam); // Verifica si agregar el carácter es válido
             }
-        }
 
-        // Seleccionar carácter según la frecuencia o al azar si hay varios válidos
-        char selectedChar;
-        if (!candidatos.empty()) {
-            selectedChar = candidatos[rand() % candidatos.size()]; // Selección aleatoria de los válidos
-        } else {
+            // Crear un vector de caracteres válidos
+            std::vector<char> candidatos;
+            for (const auto& kv : validChars) {
+                
+                if (kv.second) {
+                    candidatos.push_back(kv.first); // Agregar caracteres válidos a la lista de candidatos
+                }
+            }
+
+            // Seleccionar carácter según la frecuencia o al azar si hay varios válidos
+            char selectedChar;
+            if (!candidatos.empty()) {
+                selectedChar = candidatos[rand() % candidatos.size()]; // Selección aleatoria de los válidos
+            
+            } else {
+            
             // Si no hay válidos, elige el de menor frecuencia
-            int minIndex = std::distance(std::begin(contador), std::min_element(std::begin(contador), std::end(contador)));
-            switch(minIndex){
-                case 0: selectedChar = 'A'; break;
-                case 1: selectedChar = 'C'; break;
-                case 2: selectedChar = 'G'; break;
-                case 3: selectedChar = 'T'; break;
-                default: break;
+                int minIndex = std::distance(std::begin(contador), std::min_element(std::begin(contador), std::end(contador)));
+                
+                switch(minIndex){
+                
+                    case 0: 
+                        selectedChar = 'A'; 
+                        break;
+                    case 1: 
+                        selectedChar = 'C'; 
+                        break;
+                    case 2: 
+                        selectedChar = 'G'; 
+                        break;
+                    case 3: 
+                        selectedChar = 'T'; 
+                        break;
+                    default: 
+                        break;
+                }
             }
-        }
 
-        solucion.push_back(selectedChar); // Agregar el carácter seleccionado a la solución
+            solucion.push_back(selectedChar); // Agregar el carácter seleccionado a la solución
 
-        // Reinicio del contador
-        memset(contador, 0, sizeof(contador));
+            // Reinicio del contador
+            memset(contador, 0, sizeof(contador));
 
-        // Eliminar las cadenas que ya no cumplen con la distancia de Hamming
-        if (i >= (dHam - 1)){
-            for(auto it2 = lista.begin(); it2 != lista.end();){
-                int condicion = 0;
-                for (int j = 0; j <= i; j++){
-                    char a = (*it2).at(j);
-                    if (a != solucion[j]){
-                        condicion++;
+            // Eliminar las cadenas que ya no cumplen con la distancia de Hamming
+            if (i >= (dHam - 1)){
+                
+                for(auto it2 = lista.begin(); it2 != lista.end();){
+                    
+                    int condicion = 0;
+                    for (int j = 0; j <= i; j++){
+                        
+                        char a = (*it2).at(j);
+                            if (a != solucion[j]){
+                          
+                            condicion++;
+                          
+                            }
                     }
-                }
-                if(condicion >= dHam){
-                    conjuntoSolucion.push_back(*it2);
+                    
+                    if(condicion >= dHam){
+                    
+                    conjuntoSolucion.push_back(*it2);   
                     it2 = lista.erase(it2);
-                } else {
+                    
+                    } else {
+                    
                     ++it2;
-                }
+                    
+                    }   
+                
                 condicion = 0;
+                }
             }
-        }
+
+        } else if(mode == 1 && dado == 1){
+
+            int generadorAleatorio = rand() % 4;
+            solucion.push_back(bases[generadorAleatorio]);
+    }
     }
 
     auto end = std::chrono::high_resolution_clock::now();
