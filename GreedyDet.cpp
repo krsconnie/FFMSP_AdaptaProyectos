@@ -32,11 +32,13 @@ bool evaluate(const std::list<std::string> &lista, const std::string &solucion, 
 int main(int argc, char const *argv[]) {
 
     float umbral = atof(argv[4]); // Umbral para la distancia de Hamming
+    int mode = atoi(argv[5]);
 
-    if(argc != 5 || std::string(argv[1]) != "-i" || std::string(argv[3]) != "-th" || (umbral > 1 || umbral < 0)){
-        std::cerr << "Uso: " << argv[0] << " -i <instancia_problema> -th threshold" << std::endl;
+    if(argc != 6 || std::string(argv[1]) != "-i" || std::string(argv[3]) != "-th" || (umbral > 1 || umbral < 0) || (mode != 1 && mode != 0)){
+        std::cerr << "Uso: " << argv[0] << " -i <instancia_problema> -th threshold < 0 / 1 > \n 0 = Greedy Determinista \n 1 = Greedy Aleatorizado" << std::endl;
         return EXIT_FAILURE;
     }
+
 
     std::string nombreArchivo = argv[2];
     std::list<std::string> lista;
@@ -113,7 +115,7 @@ int main(int argc, char const *argv[]) {
                 int condicion = 0;
                 for (int j = 0; j <= i; j++){
                     char a = (*it2).at(j);
-                    if (a == solucion[j]){
+                    if (a != solucion[j]){
                         condicion++;
                     }
                 }
