@@ -65,9 +65,9 @@ int main(int argc, char const *argv[]) {
     std::vector<char> bases = {'A', 'C', 'G', 'T'}; // Posibles caracteres para elegir
 
     int dado = 0;
-    dado = rand() % 2;
 
     for (int i = 0; i < m; i++){
+        dado = rand() % 2;
         if(mode == 0 || dado == 0){
             
             for(auto it = lista.begin(); it != lista.end(); it++){
