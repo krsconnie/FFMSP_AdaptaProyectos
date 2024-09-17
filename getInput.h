@@ -23,7 +23,5 @@ void getStrings(const std::string& nombreArchivo, std::list<std::string>& lista)
         linea.erase(std::remove(linea.begin(), linea.end(),'\n'),linea.end());
         lista.push_back(linea);
 
-        //Flag
-        std::cerr << "Linea pusheada exitosamente " << std::endl;
     }
 }
