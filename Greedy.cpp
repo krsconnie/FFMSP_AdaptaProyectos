@@ -64,7 +64,7 @@ int main(int argc, char const *argv[]) {
 
     std::vector<char> bases = {'A', 'C', 'G', 'T'}; // Posibles caracteres para elegir
 
-    int dado;
+    int dado = 0;
     dado = rand() % 2;
 
     for (int i = 0; i < m; i++){
@@ -155,6 +155,7 @@ int main(int argc, char const *argv[]) {
                     for (int j = 0; j <= i; j++){
                         
                         char a = (*it2).at(j);
+                           
                             if (a != solucion[j]){
                           
                             condicion++;
@@ -188,8 +189,8 @@ int main(int argc, char const *argv[]) {
     tiempo = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
     tiempo *= (1e-9);
 
-    std::cout << "Tamaño de la solución: " << solucion.size() << " // Línea solución encontrada: " << solucion;
-    std::cout << "\nDistancia Hamming designada: " << dHam << "\nCalidad de la solución: " << conjuntoSolucion.size() << "\nConjunto original queda con: " << lista.size()  << std::endl;
+    //std::cout << "Tamaño de la solución: " << solucion.size() << " // Línea solución encontrada: " << solucion;
+    std::cout << "\nCalidad de la solución: " << conjuntoSolucion.size() << std::endl;
     std::cout << "Tiempo usado: " << tiempo << " segundos" << std::endl;
     
     return 0;
