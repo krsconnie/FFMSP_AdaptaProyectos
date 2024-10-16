@@ -33,10 +33,10 @@ int main(int argc, char const *argv[]) {
 
     srand(time(0));
     float umbral = atof(argv[4]); // Umbral para la distancia de Hamming
-    int mode = atoi(argv[5]);
+    float mode = atof(argv[5]); //Porcentaje de randomizado
 
-    if(argc != 6 || std::string(argv[1]) != "-i" || std::string(argv[3]) != "-th" || (umbral > 1 || umbral < 0) || (mode != 1 && mode != 0)){
-        std::cerr << "Uso: " << argv[0] << " -i <instancia_problema> -th threshold < 0 / 1 > \n 0 = Greedy Determinista \n 1 = Greedy Aleatorizado" << std::endl;
+    if(argc != 6 || std::string(argv[1]) != "-i" || std::string(argv[3]) != "-th" || (umbral <= 1 || umbral >= 0) || (mode <= 1 && mode >= 0)){
+        std::cerr << "Uso: " << argv[0] << " -i <instancia_problema> -th threshold < 0 / 1 > \n 0 = Greedy Determinista \n 0.numero = Porcentaje randomizado para Greedy aleatorizado" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -64,11 +64,11 @@ int main(int argc, char const *argv[]) {
 
     std::vector<char> bases = {'A', 'C', 'G', 'T'}; // Posibles caracteres para elegir
 
-    int dado = 0;
+   float dado = 0;
 
     for (int i = 0; i < m; i++){
-        dado = rand() % 2;
-        if(mode == 0 || dado == 0){
+        dado = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        if(dado > mode){
             
             for(auto it = lista.begin(); it != lista.end(); it++){
                 char a = (*it).at(i);
@@ -178,7 +178,7 @@ int main(int argc, char const *argv[]) {
                 }
             }
 
-        } else if(mode == 1 && dado == 1){
+        } else if(mode >= dado){
 
             int generadorAleatorio = rand() % 4;
             solucion.push_back(bases[generadorAleatorio]);
