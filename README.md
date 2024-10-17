@@ -9,12 +9,10 @@ Objetivo:
     Esto implica diseñar una solución que no solo identifique la cadena más común, 
     sino que también encuentre una cadena que esté "lejos" en términos de similitud de caracteres.
 
-
-
-
+# LISTA #
 # Primera Entrega: 14 de Septiembre #
 
-  Desarrollar una heurística greedy y una heurística greedy aleatorizada. [Pendiente]
+  Desarrollar una heurística greedy y una heurística greedy aleatorizada. [Listo]
 
   REQUISITOS MÍNIMOS: 
     
@@ -48,3 +46,35 @@ Objetivo:
             Sumar esto al reporte PDF antes nombrado con una tabla complementaria (1 página), con su análisis.
 
   
+# Segunda Entrega: 18 de Octubre #
+
+Objetivo 
+
+    Busca implementar una Metaheurística de trayectoria o solución única para resolver el Problema FFMS. 
+
+REQUISITOS:
+
+      Any-Time Behavior: La metaheurística debe utilizar como criterio de detención el tiempo de ejecución.Este tiempo debe ser especificado en segundos. Adicionalmente la implementación debe permitir análisis any-time behavior. Para lograr esto, es           mandatorio que cada vez que la metaheurística logre una nueva mejor solución, muestre por salida estándar la calidad de la solución, y el tiempo en que la encontró, (desde el inicio del algoritmo).
+
+       Al final de la ejecución (cumplido el tiempo máximo de ejecución) el algoritmo debe  entregar por salida estándar la calidad de la mejor  solución encontrada y el tiempo cuando la encontró.
+    
+ENTREGABLES:
+
+      
+    1.Códigos fuentes del proyecto e instrucciones  para poder  compilar/interpretar correctamente la metaheurística.
+    2.Manual de uso básico (1 página)
+    3.Especificaciones del algoritmo (descripción en pseudolenguaje explicando componentes y funcionamiento) (max 2 páginas)
+    4.Video corto screencast que muestre el funcionamiento del programa en su ambiente de trabajo (no más de 2 minutos)
+
+La tabla de resultados contiene:
+
+![image](https://github.com/user-attachments/assets/f070621c-2092-4764-af42-4f239f70d83d)
+
+    Lo mismo que en la primera entrega, pero se agregan 3 datos más:
+
+      1.Media de la mejor solución encontrada en el tiempo determinado.
+      2.Desviación estándar de la misma mejor solución encontrada.
+      3.Tiempo promedio para obtener esta solución.
+
+RUBRICA:
+![image](https://github.com/user-attachments/assets/a31defe4-18e9-497d-b075-605d2af53191)
