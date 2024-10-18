@@ -1,3 +1,6 @@
+#ifndef GETINPUT_H
+#define GETINPUT_H
+
 #include <iostream>
 #include <fstream>
 #include <list>
@@ -25,3 +28,5 @@ void getStrings(const std::string& nombreArchivo, std::list<std::string>& lista)
 
     }
 }
+
+#endif
