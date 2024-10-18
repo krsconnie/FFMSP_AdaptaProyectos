@@ -13,11 +13,12 @@ std::string greedy(std::list<std::string> &lista, int largo, float umbral,float 
  std::list<std::string> conjuntoSolucion; 
  std::string solucion;
 
- float dado = 0;
+ float dado;
  
  for (int i = 0; i < largo; i++){
 	
 	dado = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+ 	
  	char selectedChar;
 
  	if(dado <= probRandom){

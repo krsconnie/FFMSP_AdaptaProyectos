@@ -7,6 +7,7 @@
 #include <cstring>
 #include <algorithm>
 #include <ctime>
+
 /**
  hammingDist devuelve el valor de la distancia de Hamming entre 2 cadenas dadas
 **/
@@ -22,9 +23,11 @@ int hammingDist(const std::string &cadena, const std::string &solucion){
 	}
 	return distancia;
 }
+
 /**
  Devuelve la calidad de la solucion candidata (Cuantos strings cumplen con la condicion)
  **/
+
 int calidad(int dHam,const std::list<std::string> &lista, const std::string &solucion){
 
 	int calidad = 0;
@@ -132,29 +135,26 @@ y lo devuelve con las bases menos la que ya esta siendo usada
 
 **/
 
-void otrosChar(char seleccionado, std::vector<char> otrosChar){
-	
-	switch(seleccionado){
-		case 'A':
-			otrosChar = {'C','G','T'};
-			break;
-
-		case 'C':
-			otrosChar = {'A','G','T'};
-			break;
-
-		case 'G':
-			otrosChar = {'A','C','T'};
-			break;
-
-		case 'T':
-			otrosChar = {'A','C','G'};
-			break;
-
-		default:
-			break;
-		}
-	return   ; 
+void otrosChar(char seleccionado, std::vector<char>& otrosChar) {
+   
+    switch(seleccionado) {
+        case 'A':
+            otrosChar = {'C', 'G', 'T'};
+            break;
+        case 'C':
+            otrosChar = {'A', 'G', 'T'};
+            break;
+        case 'G':
+            otrosChar = {'A', 'C', 'T'};
+            break;
+        case 'T':
+            otrosChar = {'A', 'C', 'G'};
+            break;
+        default:
+            otrosChar.clear(); // En caso de error, limpiar el vector
+            break;
+    }
 }
+
 
 #endif 
