@@ -57,7 +57,7 @@ int main(int argc, char const *argv[]) {
     srand(time(0));
 
     if (argc != 7 || std::string(argv[1]) != "-i" || std::string(argv[3]) != "-th") {
-        std::cerr << "Uso: " << argv[0] << " -i <instancia_problema> -th threshold <[0,...,1]>\n" << std::endl;
+        std::cerr << "Uso: " << argv[0] << " -i <instancia_problema> -th threshold <[0,...,1]>  <tiempo Máximo>\n" << std::endl;
         return EXIT_FAILURE;
     }
 
