@@ -21,11 +21,12 @@ for it in {1..6}; do
     		for size in 300 600 800; do
 			for n in {001..100}; do
   				file_name="${a}-${size}-${n}.txt"
-        
+
         			umbral="0.75"
         			mode="0"
+				tiempo_max="50"
 
-		        	result=$(./MetaHeuristica -i "$file_name" -th "$umbral" "$mode")
+		        	result=$(./MetaHeuristica -i "$file_name" -th "$umbral" "$mode" "$tiempo_max")
        				tiempo=$(echo "$result" | grep "Tiempo usado" | awk '{print $3}')
        				calidad=$(echo "$result" | grep "Calidad de la solución" | awk '{print $5}')
        				echo "$file_name,$tiempo,$calidad" >> $output_file${it}
