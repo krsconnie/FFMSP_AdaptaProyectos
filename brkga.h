@@ -10,182 +10,298 @@
 #include <algorithm>
 #include "utilidades.h"
 
-// Mapea un valor [0, 1) a un carácter ('A', 'C', 'T', 'G') basado en rangos específicos.
-char mapKeyToChar(double key) { 
+
+char mapKeyToChar(double key) { // Asigna a cada character un rango de numeros
+    
     if (key < 0.25) return 'A';
     else if (key < 0.5) return 'C';
     else if (key < 0.75) return 'T';
     else return 'G';
+
 }
 
-// Decodifica un cromosoma (vector de valores [0, 1)) a una cadena de caracteres ('A', 'C', 'T', 'G').
+
 std::string decodeChromosome(const std::vector<double>& chromosome) {
+    
     std::string decoded;
+    
     for (double key : chromosome) {
         decoded.push_back(mapKeyToChar(key));
     }
     return decoded;
 }
 
-// Codifica una cadena de caracteres ('A', 'C', 'T', 'G') a un vector de valores aleatorios en subrangos específicos.
-std::vector<double> encoder(const std::string& input) {
-    std::vector<double> encrypted;
-    mt19937 generator(static_cast<unsigned>(time(nullptr))); // Generador aleatorio
 
-    for (char ch : input) {
-        if (ch == 'A') {
-            uniform_real_distribution<double> distA(0.0, 0.25);
+std::vector<double> encoder(const std::string& input){
+  
+    std::vector<double> encrypted;
+    std::mt19937 generator(static_cast<unsigned>(time(nullptr))); // Random number generator with seed
+
+    for (char ch : input){
+        if(ch == 'A'){
+            std::uniform_real_distribution<double> distA(0.0, 0.25);
             encrypted.push_back(distA(generator));
-        } else if (ch == 'C') {
-            uniform_real_distribution<double> distC(0.26, 0.50);
+
+        }else if (ch == 'C'){
+            std::uniform_real_distribution<double> distC(0.26, 0.50);
             encrypted.push_back(distC(generator));
-        } else if (ch == 'T') {
-            uniform_real_distribution<double> distT(0.51, 0.75);
+
+        }else if (ch == 'T'){
+            std::uniform_real_distribution<double> distT(0.51, 0.75);
             encrypted.push_back(distT(generator));
-        } else if (ch == 'G') {
-            uniform_real_distribution<double> distG(0.76, 1.0);
+
+        }else if (ch == 'G'){
+            std::uniform_real_distribution<double> distG(0.76, 1.0);
             encrypted.push_back(distG(generator));
-        } else {
-            std::cout << "Carácter inválido.\n";
+
+        }else{
+            std::cout <<"Carácter inválido.\n";
             return {};
         }
     }
     return encrypted;
 }
 
-// Genera una población inicial de soluciones aleatorias.
-// p: Número de soluciones a generar.
-// m: Longitud de cada solución (cromosoma).
+
+/*
+createPSol crea la población inical de soluciones de manera randomizada 
+int p: hace referencia a la cantidad de soluciones de la población total
+int m: es el tamaño o largo de las soluciones
+*/
+
 void createPSol(int p, int m, std::list<std::vector<double>>& Pobl) { 
-    std::srand(std::time(0)); // Semilla aleatoria
+    
+    // Semilla para el generador de números aleatorios
+    std::srand(std::time(0)); // Usa la hora actual como semilla
+
+    // Limpia la lista por si ya tiene elementos
     Pobl.clear();
 
+    // Generar 'p' cromosomas
     for (int i = 0; i < p; ++i) {
-        std::vector<double> chromosome(m);
+        std::vector<double> chromosome(m); // Cromosoma de tamaño 'm'
+
+        // Generar genes aleatorios en el rango [0, 1)
         for (int j = 0; j < m; ++j) {
             chromosome[j] = static_cast<double>(std::rand()) / RAND_MAX;
         }
+
+        // Agregar el cromosoma a la población
         Pobl.push_back(chromosome);
     }
 }
 
-// Decodifica una lista de cromosomas en una lista de soluciones (cadenas de caracteres).
-void decodedList(std::list<std::vector<double>>& chromosomes, std::list<std::string>& sols) {
+
+
+void decodedList(std::list<std::vector<double>>& chromosomes, std::list<std::string>& sols){
+
+    // Iterar sobre cada cromosoma y decodificarlo
     for (const auto& chromosome : chromosomes) {
-        sols.push_back(decodeChromosome(chromosome));
+        std::string decoded = decodeChromosome(chromosome);
+        sols.push_back(decoded);
     }
-    chromosomes.clear(); // Limpia la lista para reutilizar.
+
+    chromosomes.clear(); // borrarla para reutilizarla wink wink ;)
 }
 
-// Codifica una lista de soluciones en una lista de cromosomas.
-void codedList(std::list<std::vector<double>>& chromosomes, std::list<std::string>& sols) {
-    for (const auto& sol : sols) {
-        chromosomes.push_back(encoder(sol));
+
+void codedList(std::list<std::vector<double>>& chromosomes, std::list<std::string>& sols){
+
+    for(const auto& sol : sols){
+        std::vector<double> coded = encoder(sol);
+        chromosomes.push_back(coded);
     }
+
 }
 
-// Calcula las calidades de un conjunto de soluciones.
-// dHam: Distancia de Hamming.
-// quality: Vector donde se almacenarán las calidades.
-// list: Conjunto de referencias para calcular calidad.
-// sols: Soluciones a evaluar.
-void calculateQuality(int dHam, std::vector<int>& quality, 
-                      const std::list<std::string>& list, const std::list<std::string>& sols) { 
+/*
+Nueva función para calcular calidades para un conjunto de soluciones
+*/
+
+
+void calculateQuality(int dHam,std::vector<int>& quality, 
+    const std::list<std::string>& list, const std::list<std::string>& sols) { 
+   
     for (const auto& sol : sols) {
+        // Usa la función calidad para calcular la calidad de cada solución
         int qualitySol = calidad(dHam, list, sol);
         quality.push_back(qualitySol);
     }
+
 }
 
-// Comprueba si alguna calidad supera el umbral definido.
-bool stoppinRule(std::vector<int>& quality, int thresholdDiference) {
-    for (auto& q : quality) {
-        if (q >= thresholdDiference) {
+
+bool stoppinRule(std::vector<int>& quality, int thresholdDiference){
+
+    for(auto& q : quality){
+        
+        if(q >=  thresholdDiference){
             return true;
         }
     }
     return false;
 }
 
-// Ordena soluciones por calidad en orden descendente.
+
 void preselection(std::vector<int>& quality, std::list<std::string>& sols) {
-    std::list<std::string> sortedsols;
-    std::vector<int> numeros = quality;
-
-    for (int i = 0; i < sols.size(); ++i) {
-        auto it = std::max_element(numeros.begin(), numeros.end());
-        int posicion = std::distance(numeros.begin(), it);
-        auto solIt = sols.begin();
-        std::advance(solIt, posicion);
-
-        sortedsols.push_back(*solIt);
-        numeros[posicion] = -1; // Evitar duplicados.
+    // Verificar que quality y sols tienen el mismo tamaño
+    if (quality.size() != sols.size()) {
+        throw std::invalid_argument("quality y sols deben tener el mismo tamaño");
     }
 
+    // Crear un vector de pares (calidad, solución)
+    std::vector<std::pair<int, std::string>> pairedSolutions;
+
+    auto it_sols = sols.begin();
+    for (size_t i = 0; i < quality.size(); ++i, ++it_sols) {
+        pairedSolutions.emplace_back(quality[i], *it_sols);
+    }
+
+    // Ordenar las soluciones por calidad de forma descendente
+    std::sort(pairedSolutions.begin(), pairedSolutions.end(),
+              [](const auto& a, const auto& b) { return a.first > b.first; });
+
+    // Actualizar la lista `sols` con las soluciones ordenadas
+    sols.clear();
+    for (const auto& pair : pairedSolutions) {
+        sols.push_back(pair.second);
+    }
+
+    // Limpiar quality, ya que no es necesaria tras la ordenación
     quality.clear();
-    sols.swap(sortedsols);
 }
 
-// Divide la población en élite, no élite, y mutantes.
-void sortPobl(int gen, int pElite, int pMutants, std::list<std::vector<double>>& elite, 
-              std::list<std::vector<double>>& nonElite, std::list<std::string>& sols) { 
-    std::srand(std::time(0)); // Semilla
-    gen++;
+
+void sortPobl(
+    int gen,
+    int pElite,
+    int pMutants,
+    int m, // Tamaño de los cromosomas
+    std::list<std::vector<double>>& elite,
+    std::list<std::vector<double>>& nonElite,
+    std::list<std::vector<double>>& sols // Cambiar tipo de std::string a std::vector<double>
+) {
+    gen++; // Incrementamos el número de generación
+
+    // Verificar que el número total de individuos coincide con el tamaño de 'sols'
+    if (pElite + pMutants > sols.size()) {
+        throw std::invalid_argument("El tamaño de 'sols' es insuficiente para pElite y pMutants.");
+    }
+
     auto it = sols.begin();
 
+    // Extraer los individuos elite
     for (int i = 0; i < pElite; ++i) {
         elite.push_back(*it);
         ++it;
     }
 
-    for (int i = pElite; i < sols.size() - pMutants; ++i) {
+    // Extraer los individuos no elite
+    for (int i = 0; i < sols.size() - pElite - pMutants; ++i) {
         nonElite.push_back(*it);
         ++it;
     }
 
-    for (int j = 0; j < pMutants; ++j) {
-        std::vector<double> chromosome(elite.front().size());
-        for (auto& gene : chromosome) {
-            gene = static_cast<double>(std::rand()) / RAND_MAX;
+    // Generar mutantes (individuos con cromosomas aleatorios)
+    if (pMutants > 0) {
+        for (int j = 0; j < pMutants; ++j) {
+            std::vector<double> chromosome(m);
+
+            // Generar genes aleatorios en el rango [0, 1)
+            for (int k = 0; k < m; ++k) {
+                chromosome[k] = static_cast<double>(std::rand()) / RAND_MAX;
+            }
+
+            // Agregar el cromosoma mutante a nonElite
+            nonElite.push_back(chromosome);
         }
-        nonElite.push_back(chromosome);
     }
 
+    // Limpiar la lista 'sols' después de procesar
     sols.clear();
 }
 
-// Realiza un cruce sesgado entre dos cromosomas.
-std::vector<double> biasedCrossover(const std::vector<double>& eliteParent, 
-                                    const std::vector<double>& nonEliteParent, 
-                                    double bias) {
+
+#include <vector>
+#include <random>
+
+std::vector<double> biasedCrossover(
+    const std::vector<double>& eliteParent,
+    const std::vector<double>& nonEliteParent,
+    double bias
+) {
+    // Validación de tamaños
+    if (eliteParent.size() != nonEliteParent.size()) {
+        throw std::invalid_argument("Los padres deben tener el mismo tamaño.");
+    }
+
     std::vector<double> offspring(eliteParent.size());
-    std::srand(std::time(0));
+
+    // Generador aleatorio moderno
+    std::random_device rd;
+    std::mt19937 gen(rd()); // Motor Mersenne Twister
+    std::uniform_real_distribution<> dis(0.0, 1.0); // Distribución uniforme [0, 1)
 
     for (size_t i = 0; i < eliteParent.size(); ++i) {
-        double prob = static_cast<double>(std::rand()) / RAND_MAX;
-        offspring[i] = (prob < bias) ? eliteParent[i] : nonEliteParent[i];
+        double prob = dis(gen); // Generar un número aleatorio entre 0 y 1
+
+        // Seleccionar gen del padre élite o no élite
+        if (prob < bias) {
+            offspring[i] = eliteParent[i];
+        } else {
+            offspring[i] = nonEliteParent[i];
+        }
     }
+
     return offspring;
 }
 
-// Genera una nueva población cruzando soluciones élite y no élite.
-void newPobl(int bias, int pMutants, std::list<std::string>& sols,
-             std::list<std::vector<double>>& elite, std::list<std::vector<double>>& nonElite) {
-    std::srand(std::time(0));
 
-    for (const auto& eliteSol : elite) {
-        sols.push_back(eliteSol);
+void newPobl(
+    double bias, int pMutants,
+    std::list<std::vector<double>>& sols,
+    std::list<std::vector<double>>& elite,
+    std::list<std::vector<double>>& nonElite
+) {
+    // Validar entradas
+    if (bias < 0.0 || bias > 1.0) {
+        throw std::invalid_argument("El parámetro bias debe estar entre 0 y 1.");
+    }
+    if (elite.empty() || nonElite.empty()) {
+        throw std::invalid_argument("Las listas elite y nonElite no deben estar vacías.");
     }
 
+    // Generador de números aleatorios
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distElite(0, elite.size() - 1);
+    std::uniform_int_distribution<> distNonElite(0, nonElite.size() - 1);
+
+    // Agregar soluciones élite directamente
+    for (const auto& ind : elite) {
+        sols.push_back(ind);
+    }
+
+    // Generar descendencia para los no élite
+    auto itElite = elite.begin();
+    auto itNonElite = nonElite.begin();
+
     for (size_t i = 0; i < nonElite.size() - pMutants; ++i) {
-        auto itElite = elite.begin();
-        auto itNonElite = nonElite.begin();
+        // Seleccionar padres aleatorios
+        std::advance(itElite, distElite(gen));
+        std::advance(itNonElite, distNonElite(gen));
 
-        std::advance(itElite, rand() % elite.size());
-        std::advance(itNonElite, rand() % nonElite.size());
+        const std::vector<double>& parent1 = *itElite;
+        const std::vector<double>& parent2 = *itNonElite;
 
-        sols.push_back(biasedCrossover(*itElite, *itNonElite, bias));
+        // Generar descendencia usando biasedCrossover
+        sols.push_back(biasedCrossover(parent1, parent2, bias));
+
+        // Reiniciar iteradores
+        itElite = elite.begin();
+        itNonElite = nonElite.begin();
     }
 }
 
 #endif
+
