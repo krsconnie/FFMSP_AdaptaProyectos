@@ -131,10 +131,11 @@ void calculateQuality(int dHam,std::vector<int>& quality,
 }
 
 
-bool stoppinRule(std::vector<int>& quality, int thresholdDiference){
-
+bool stoppinRule(std::vector<int>& quality, int thresholdDiference, int n){
+    n = 0;
+    
     for(auto& q : quality){
-        
+        n++;
         if(q >=  thresholdDiference){
             return true;
         }
@@ -222,8 +223,6 @@ void sortPobl(
 }
 
 
-#include <vector>
-#include <random>
 
 std::vector<double> biasedCrossover(
     const std::vector<double>& eliteParent,
