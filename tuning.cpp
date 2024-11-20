@@ -131,7 +131,7 @@ int main(int argc, char const *argv[]) {
     if (stop) {
         auto itPoblacionStrings = poblacionString.begin();
         std::advance(itPoblacionStrings, indice);
-        best_metric = calidad[indice];
+        best_metric = (calidad[indice])*-1;
         solucion = *itPoblacionStrings;
     }
 
