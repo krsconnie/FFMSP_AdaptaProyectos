@@ -8,31 +8,63 @@
 #include <cstdlib>
 #include <ctime>
 
-std::vector<std::string> geneticAlgorithm(const std::list<std::string>& inputList, int length, int populationSize, float mutationProbability, int dHamThreshold) {
-    std::list<std::vector<double>> initPopulation;
-    createPSol(populationSize, length, initPopulation);             //We create the initial population
+std::vector<std::string> geneticAlgorithm(const std::list<std::string>& inputList, int length, int populationSize, float mutationProbability, int dHamThreshold){
+    bool stopCondition = false;
+    std::list<std::vector<double>> initPopulation;                  //Current population
+    std::list<std::vector<double>> eliteChromosomes, nonEliteChromosomes;   //Initialize lists for elite and non-elite populations
+    std::vector<int> qualityScores;                                 //Then we evaluate the initial fitness
+    int gen = 0;
+
+    createPSol(populationSize, length, initPopulation);             //Create the initial population
 
     std::list<std::string> decodedSolutions;                        //Decode initial solutions to strings
     decodedList(initPopulation, decodedSolutions);
 
-    std::vector<int> qualityScores;                                 //We evaluate the initial fitness
-    calculateQuality(dHamThreshold, qualityScores, inputList, decodedSolutions);
-    preselection(qualityScores, decodedSolutions);                  //Sort by fitness and extract the elite solutions
-                                                                    //Up to here, we're doing great!
+    while (!stopCondition) {
+        qualityScores.clear();
+        populationSize = decodedSolutions.size();
 
-    float eliteProportion = 1 - mutationProbability;
-    std::list<std::vector<double>> eliteChromosomes, nonEliteChromosomes;   //Prepare lists for elite and non-elite populations
-    int eliteSize = populationSize*eliteProportion;                           //20% elite since we decided to make it deterministic (0% of mutation). We can modify this if necessary.
-    int mutantSize = populationSize * mutationProbability;
+        calculateQuality(dHamThreshold, qualityScores, inputList, decodedSolutions); //Calculate fitness scores
+        stopCondition = stoppinRule(qualityScores, dHamThreshold);                   //Check stopping condition (element in quality scores exceeds the threshold).
 
-    sortPobl(0, eliteSize, mutantSize, length, eliteChromosomes, nonEliteChromosomes, initPopulation);    //We sort it once more.
-    
-    double crossoverBias = 0.7;                                     //We can also modify the crossover bias if necessary
-    newPobl(crossoverBias, mutantSize, initPopulation, eliteChromosomes, nonEliteChromosomes);  //Generate new population
-    
-    decodedSolutions.clear();                                       //Decode and return solutions
-    decodedList(initPopulation, decodedSolutions);
-    
+        preselection(qualityScores, decodedSolutions);              //Sort by fitness and extract the elite solutions
+        
+        float eliteProportion = 1 - mutationProbability;
+        int eliteSize = populationSize * eliteProportion;           
+        int mutantSize = populationSize * mutationProbability;
+        if (eliteSize + mutantSize > populationSize) {              //Adjust sizes if they exceed the population size
+            eliteSize = populationSize - mutantSize;
+        }
+
+        eliteChromosomes.clear();
+        nonEliteChromosomes.clear();
+        sortPobl(gen, eliteSize, mutantSize, length, eliteChromosomes, nonEliteChromosomes, initPopulation, dHamThreshold, inputList);    //We sort it once more.
+
+        double crossoverBias = 0.5;                                 //We can also modify the crossover bias if necessary
+
+        std::list<std::vector<double>> nextPopulation;              //New population to replace the previous generation
+        nextPopulation.insert(nextPopulation.end(), eliteChromosomes.begin(), eliteChromosomes.end()); //Add elite solutions directly to the next generation
+
+        newPobl(crossoverBias, mutantSize, nextPopulation, eliteChromosomes, nonEliteChromosomes);  //Generate offspring and mutated solutions
+
+        // Ensure the next generation has a fixed size
+        if (nextPopulation.size() > populationSize) {
+            auto it = nextPopulation.begin();
+            std::advance(it, populationSize);
+            nextPopulation.erase(it, nextPopulation.end());
+        }
+
+        decodedSolutions.clear();                                   // Decode the new population into strings
+        decodedList(nextPopulation, decodedSolutions);
+        std::vector<int> aux_vector;                                              //A
+        calculateQuality(dHamThreshold, aux_vector, inputList, decodedSolutions); //A
+        preselection(aux_vector, decodedSolutions);                               //A
+        std::cout<<"Best Quality: "<<aux_vector[0]<<std::endl;                    //A
+
+        initPopulation = nextPopulation;                           // Replace the current generation with the new one
+    }
+
     return std::vector<std::string>(decodedSolutions.begin(), decodedSolutions.end());
 }
+
 #endif

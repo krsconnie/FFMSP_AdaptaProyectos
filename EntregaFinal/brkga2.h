@@ -123,17 +123,14 @@ void calculateQuality(int dHam,std::vector<int>& quality, const std::list<std::s
     for (const auto& sol : sols) {
         // Usa la función calidad para calcular la calidad de cada solución
         int qualitySol = calidad(dHam, list, sol);
+        //std::cout<<qualitySol<<std::endl;
         quality.push_back(qualitySol);
     }
-
 }
 
 
-bool stoppinRule(std::vector<int>& quality, int thresholdDiference, int n){
-    n = 0;
-    
+bool stoppinRule(std::vector<int>& quality, int thresholdDiference){
     for(auto& q : quality){
-        n++;
         if(q >=  thresholdDiference){
             return true;
         }
@@ -144,6 +141,7 @@ bool stoppinRule(std::vector<int>& quality, int thresholdDiference, int n){
 
 void preselection(std::vector<int>& quality, std::list<std::string>& sols) {
     // Verificar que quality y sols tienen el mismo tamaño
+    //std::cout << "qualityScores: " << quality.size() << " || decodedSolutions: "<< sols.size() << std::endl;
     if (quality.size() != sols.size()) {
         throw std::invalid_argument("quality y sols deben tener el mismo tamaño");
     }
@@ -167,43 +165,71 @@ void preselection(std::vector<int>& quality, std::list<std::string>& sols) {
     }
 
     // Limpiar quality, ya que no es necesaria tras la ordenación
-    quality.clear();
+    //quality.clear();
 }
 
 
-void sortPobl(int gen, int pElite, int pMutants, int m, std::list<std::vector<double>>& elite, std::list<std::vector<double>>& nonElite, std::list<std::vector<double>>& sols){
+void sortPobl(int gen, int pElite, int pMutants, int m, 
+                std::list<std::vector<double>>& elite, 
+                std::list<std::vector<double>>& nonElite, 
+                std::list<std::vector<double>>& sols, int dHam, 
+                std::list<std::string> inputList){
     gen++;
-    
-    // Verificar que el número total de individuos coincide con el tamaño de 'sols'
+
     if (pElite + pMutants > sols.size()) {
-        throw std::invalid_argument("El tamaño de 'sols' es insuficiente para pElite y pMutants.");
+        throw std::invalid_argument("The size of 'sols' is insufficient for pElite and pMutants.");
     }
 
     auto it = sols.begin();
-    // Extraer los individuos elite
+    
+    // Extract elite chromosomes
     for (int i = 0; i < pElite; ++i) {
         elite.push_back(*it);
         ++it;
     }
-    // Extraer los individuos no elite
+
+    // Calculate qualities of elite chromosomes
+    std::list<std::string> decodedElite;
+    decodedList(elite, decodedElite); // Decode chromosomes to strings
+    std::vector<int> qualityScores;
+    calculateQuality(dHam, qualityScores, inputList, decodedElite);
+
+    // Pair elite chromosomes with quality scores
+    std::vector<std::pair<int, std::vector<double>>> eliteWithScores;
+    auto qualIt = qualityScores.begin();
+    for (const auto& chromosome : elite) {
+        eliteWithScores.emplace_back(*qualIt, chromosome);
+        ++qualIt;
+    }
+
+    // Sort elite chromosomes by quality score
+    std::sort(eliteWithScores.begin(), eliteWithScores.end(), 
+              [](const auto& a, const auto& b) { return a.first > b.first; });
+
+    // Update the elite list
+    elite.clear();
+    for (const auto& pair : eliteWithScores) {
+        elite.push_back(pair.second);
+    }
+
+    // Extract non-elite chromosomes
     for (int i = 0; i < sols.size() - pElite - pMutants; ++i) {
         nonElite.push_back(*it);
         ++it;
     }
-    // Generar mutantes (individuos con cromosomas aleatorios) if pMutants > 0
+
+    // Generate mutants if pMutants > 0
     if (pMutants > 0) {
         for (int j = 0; j < pMutants; ++j) {
             std::vector<double> chromosome(m);
-            // Generar genes aleatorios en el rango [0, 1)
             for (int k = 0; k < m; ++k) {
                 chromosome[k] = static_cast<double>(std::rand()) / RAND_MAX;
             }
-            // Agregar el cromosoma mutante a nonElite
             nonElite.push_back(chromosome);
         }
     }
-    // Limpiar la lista 'sols' después de procesar
-    sols.clear();
+
+    sols.clear(); // Clear sols after processing
 }
 
 std::vector<double> biasedCrossover(

@@ -24,23 +24,24 @@ void mhp_mht(std::list<std::string>& lista, int largo, float umbral, int maxTime
     int best_metric = -1;
     double best_time = 0;
 
-    while (true) {  //Each instance of geneticAlgorithm() takes less than 1 second supposedly, so it never leaves this loop. Fix.
+    while (true) {
         auto current = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = current - start;
         if (elapsed_seconds.count() >= maxTime) {
             break;
         }
 
-        std::vector<std::string> solucionesIniciales = geneticAlgorithm(aux, largo, populationSize, probRandom, dHam);     
+        sortSolucionesElite(solucionesElite);
+
+        std::vector<std::string> poblacionAG = geneticAlgorithm(aux, largo, populationSize, probRandom, dHam); 
+        std::cout<<"Size Población AG: "<<poblacionAG.size()<<std::endl;     
         std::string solucion;
         int calidad_solucion;
-        for(int i=0; i<solucionesIniciales.size(); i++){
-            solucion = localSearch(lista, solucionesIniciales[i], dHam);    //Local Search is applied to all initial solutions and then the best one is chosen.
+        for(int i=0; i<poblacionAG.size(); i++){
+            solucion = localSearch(lista, poblacionAG[i], dHam);    //Local Search is applied to all initial solutions and then the best one is chosen.
             calidad_solucion = calidad(dHam, lista, solucion);
             solucionesElite.emplace_back(solucion, calidad_solucion);
         }
-
-        sortSolucionesElite(solucionesElite);
 
         if (solucionesElite[0].second > best_metric){
             best_metric = solucionesElite[0].second;
@@ -74,6 +75,7 @@ int main(int argc, char const *argv[]) {
     getStrings(nombreArchivo, lista);                       //Obtener los strings de entrada
 
     int m = std::stoi(nombreArchivo.substr(4, 3));          //Largo del string
+    //std::cout<<m<<std::endl; //El largo del archivo ingresado por consola normalmente, es 300. ¿Por qué la calidad SIEMPRE da 100 y no mejora en cada generación?
     mhp_mht(lista, m, umbral, maxTime, probRandom, populationSize);     //Ejecutar MH_p+MH_t; EDITAR PARAMETROS.
 
     return 0;
