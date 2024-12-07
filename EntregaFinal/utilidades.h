@@ -26,12 +26,14 @@ int hammingDist(const std::string &cadena, const std::string &solucion){
 
 int calidad(int dHam,const std::list<std::string> &lista, const std::string &solucion){
     int calidad = 0;
-    for(const auto& cadena : lista){
+    for(const auto& cadena : lista){	//THE ERROR IS HERE! "lista" is always of max size 100, so it can never grow past it!
+		//std::cout<<"Size of lista: "<<lista.size()<<" || Length of cadena: "<<cadena.size()<<std::endl;
         int dif = hammingDist(cadena, solucion);
         if(dif >= dHam){
             calidad++;
         }
     }
+	//std::cout<<"calidad: "<<calidad<<std::endl;
     return calidad;
 }
 

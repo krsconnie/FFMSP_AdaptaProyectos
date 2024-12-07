@@ -56,11 +56,6 @@ std::vector<std::string> geneticAlgorithm(const std::list<std::string>& inputLis
 
         decodedSolutions.clear();                                   // Decode the new population into strings
         decodedList(nextPopulation, decodedSolutions);
-        std::vector<int> aux_vector;                                              //A
-        calculateQuality(dHamThreshold, aux_vector, inputList, decodedSolutions); //A
-        preselection(aux_vector, decodedSolutions);                               //A
-        std::cout<<"Best Quality: "<<aux_vector[0]<<std::endl;                    //A
-
         initPopulation = nextPopulation;                           // Replace the current generation with the new one
     }
 

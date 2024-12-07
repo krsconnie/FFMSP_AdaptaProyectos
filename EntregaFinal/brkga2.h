@@ -114,20 +114,16 @@ void codedList(std::list<std::vector<double>>& chromosomes, std::list<std::strin
 
 }
 
-/*
-Nueva función para calcular calidades para un conjunto de soluciones
-*/
-
-
 void calculateQuality(int dHam,std::vector<int>& quality, const std::list<std::string>& list, const std::list<std::string>& sols) { 
     for (const auto& sol : sols) {
-        // Usa la función calidad para calcular la calidad de cada solución
-        int qualitySol = calidad(dHam, list, sol);
-        //std::cout<<qualitySol<<std::endl;
-        quality.push_back(qualitySol);
+        int avgHamDist = 0;
+        for(const auto& chain : list){
+            avgHamDist += hammingDist(chain, sol);
+        }
+        avgHamDist = avgHamDist/list.size();
+        quality.push_back(avgHamDist);
     }
 }
-
 
 bool stoppinRule(std::vector<int>& quality, int thresholdDiference){
     for(auto& q : quality){
