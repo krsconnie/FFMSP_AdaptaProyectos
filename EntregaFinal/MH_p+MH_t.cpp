@@ -33,7 +33,7 @@ void mhp_mht(std::list<std::string>& lista, int largo, float umbral, int maxTime
 
         sortSolucionesElite(solucionesElite);
 
-        std::vector<std::string> poblacionAG = geneticAlgorithm(aux, largo, populationSize, probRandom, dHam); 
+        std::vector<std::string> poblacionAG = geneticAlgorithm(aux, largo, populationSize, probRandom, dHam, maxTime); 
         std::cout<<"Size Población AG: "<<poblacionAG.size()<<std::endl;     
         std::string solucion;
         int calidad_solucion;

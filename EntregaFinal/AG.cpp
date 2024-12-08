@@ -7,8 +7,9 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 
-std::vector<std::string> geneticAlgorithm(const std::list<std::string>& inputList, int length, int populationSize, float mutationProbability, int dHamThreshold){
+std::vector<std::string> geneticAlgorithm(const std::list<std::string>& inputList, int length, int populationSize, float mutationProbability, int dHamThreshold, int maxTime){
     bool stopCondition = false;
     std::list<std::vector<double>> initPopulation;                  //Current population
     std::list<std::vector<double>> eliteChromosomes, nonEliteChromosomes;   //Initialize lists for elite and non-elite populations
@@ -20,12 +21,15 @@ std::vector<std::string> geneticAlgorithm(const std::list<std::string>& inputLis
     std::list<std::string> decodedSolutions;                        //Decode initial solutions to strings
     decodedList(initPopulation, decodedSolutions);
 
+    auto startTime = std::chrono::steady_clock::now();
+
     while (!stopCondition) {
         qualityScores.clear();
         populationSize = decodedSolutions.size();
 
         calculateQuality(dHamThreshold, qualityScores, inputList, decodedSolutions); //Calculate fitness scores
-        stopCondition = stoppinRule(qualityScores, dHamThreshold);                   //Check stopping condition (element in quality scores exceeds the threshold).
+        auto elapsed_time = std::chrono::steady_clock::now() - startTime;
+        stopCondition = stoppinRule(qualityScores, dHamThreshold) || elapsed_time.count() >= maxTime;                   //Check stopping condition (element in quality scores exceeds the threshold).
 
         preselection(qualityScores, decodedSolutions);              //Sort by fitness and extract the elite solutions
         
